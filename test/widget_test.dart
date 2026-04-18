@@ -6,6 +6,7 @@ void main() {
 
     await tester.pumpWidget(const MedicalApp());
 
+
     expect(find.text('Medical Directory Mila'), findsOneWidget);
   });
 }
