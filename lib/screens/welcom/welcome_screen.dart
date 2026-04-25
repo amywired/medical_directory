@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../main.dart';
-import 'home_screen.dart';
+import '../../main.dart';
+import '../home/home_screen.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -28,7 +28,8 @@ class WelcomeScreen extends StatelessWidget {
         elevation: 0,
         actions: [
           IconButton(
-            icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode, color: primaryMint),
+            icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode,
+                color: primaryMint),
             onPressed: () => MyApp.of(context).toggleTheme(),
           ),
         ],
@@ -63,7 +64,7 @@ class WelcomeScreen extends StatelessWidget {
                       letterSpacing: 2,
                     ),
                   ),
-                  Text(
+                  const Text(
                     "MILA PROVINCE",
                     style: TextStyle(
                       color: primaryMint,
@@ -80,7 +81,8 @@ class WelcomeScreen extends StatelessWidget {
                       onPressed: () {
                         Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(builder: (context) => const HomeScreen()),
+                          MaterialPageRoute(
+                              builder: (context) => const HomeScreen()),
                         );
                       },
                       style: ElevatedButton.styleFrom(
@@ -94,7 +96,8 @@ class WelcomeScreen extends StatelessWidget {
                       ),
                       child: const Text(
                         "ENTER",
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
@@ -108,7 +111,8 @@ class WelcomeScreen extends StatelessWidget {
                 children: [
                   Text(
                     "Connect with Developer",
-                    style: TextStyle(color: isDark ? Colors.white54 : Colors.black54),
+                    style: TextStyle(
+                        color: isDark ? Colors.white54 : Colors.black54),
                   ),
                   const SizedBox(height: 15),
                   Row(
@@ -117,7 +121,8 @@ class WelcomeScreen extends StatelessWidget {
                       _socialIcon(
                         icon: Icons.email,
                         color: Colors.redAccent,
-                        onTap: () => _launchSocial("mailto:benhaouechemina@gmail.com"),
+                        onTap: () =>
+                            _launchSocial("mailto:benhaouechemina@gmail.com"),
                       ),
                       const SizedBox(width: 30),
                       _socialIcon(
@@ -129,7 +134,8 @@ class WelcomeScreen extends StatelessWidget {
                       _socialIcon(
                         icon: FontAwesomeIcons.whatsapp,
                         color: Colors.green,
-                        onTap: () => _launchSocial("https://wa.me/213792614515"),
+                        onTap: () =>
+                            _launchSocial("https://wa.me/213792614515"),
                       ),
                     ],
                   ),
@@ -142,7 +148,10 @@ class WelcomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _socialIcon({required IconData icon, required Color color, required VoidCallback onTap}) {
+  Widget _socialIcon(
+      {required IconData icon,
+      required Color color,
+      required VoidCallback onTap}) {
     return InkWell(
       onTap: onTap,
       child: Container(

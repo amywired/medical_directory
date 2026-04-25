@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:medical_directory/screens/home_screen.dart';
-import 'package:medical_directory/screens/welcome_screen.dart';
+import 'package:flutter/services.dart';
+import 'package:medical_directory/screens/welcom/welcome_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -21,36 +21,80 @@ class _MyAppState extends State<MyApp> {
 
   void toggleTheme() {
     setState(() {
-      _themeMode = _themeMode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
+      _themeMode =
+          _themeMode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Medical Directory Mila',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF00695C),
-          primary: const Color(0xFF00695C),
-        ),
-        useMaterial3: true,
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFF00695C),
-          foregroundColor: Colors.white,
-        ),
-      ),
+    final isDark = _themeMode == ThemeMode.dark;
 
-      darkTheme: ThemeData.dark(useMaterial3: true).copyWith(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF70FFD8),
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        // =========================
+        // 🔥 STATUS BAR FIX (IMPORTANT)
+        // =========================
+        statusBarColor:
+            isDark ? const Color(0xFF0D1412) : Colors.white,
+
+        statusBarIconBrightness:
+            isDark ? Brightness.light : Brightness.dark,
+
+        statusBarBrightness:
+            isDark ? Brightness.dark : Brightness.light,
+
+        // =========================
+        // 🔥 NAVIGATION BAR FIX
+        // =========================
+        systemNavigationBarColor:
+            isDark ? const Color(0xFF0D1412) : Colors.white,
+
+        systemNavigationBarIconBrightness:
+            isDark ? Brightness.light : Brightness.dark,
+      ),
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Medical Directory Mila',
+
+        // =========================
+        // 🌞 LIGHT THEME
+        // =========================
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: const Color(0xFF00695C),
+            primary: const Color(0xFF00695C),
+            brightness: Brightness.light,
+          ),
+          useMaterial3: true,
+          appBarTheme: const AppBarTheme(
+            backgroundColor: Color(0xFF00695C),
+            foregroundColor: Colors.white,
+            systemOverlayStyle: SystemUiOverlayStyle.dark,
+          ),
+        ),
+
+        // =========================
+        // 🌙 DARK THEME
+        // =========================
+        darkTheme: ThemeData(
           brightness: Brightness.dark,
+          useMaterial3: true,
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: const Color(0xFF70FFD8),
+            brightness: Brightness.dark,
+          ),
+          appBarTheme: const AppBarTheme(
+            backgroundColor: Color(0xFF0D1412),
+            foregroundColor: Colors.white,
+            systemOverlayStyle: SystemUiOverlayStyle.light,
+          ),
         ),
-      ),
-      themeMode: _themeMode,
 
-      home: const WelcomeScreen(),
+        themeMode: _themeMode,
+
+        home: const WelcomeScreen(),
+      ),
     );
   }
 }
