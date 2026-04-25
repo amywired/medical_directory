@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../main.dart';
+import '../../main.dart';
 
 class AddDoctorScreen extends StatelessWidget {
   const AddDoctorScreen({super.key});
@@ -11,7 +11,7 @@ class AddDoctorScreen extends StatelessWidget {
     final Color backgroundColor = isDark ? const Color(0xFF0D1412) : Colors.white;
     final Color cardColor = isDark ? const Color(0xFF1C2523) : Colors.grey[100]!;
     final Color inputFillColor = isDark ? const Color(0xFF2C3633) : Colors.grey[200]!;
-    final Color accentColor = const Color(0xFF86F7E1);
+    const Color accentColor = Color(0xFF86F7E1);
     final Color textColorMain = isDark ? Colors.white : Colors.black;
     final Color textColorDim = isDark ? const Color(0xFF9EAAA7) : Colors.grey[600]!;
 
@@ -21,7 +21,7 @@ class AddDoctorScreen extends StatelessWidget {
         backgroundColor: backgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: accentColor),
+          icon: const Icon(Icons.arrow_back, color: accentColor),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text('Add Doctor', style: TextStyle(color: textColorMain, fontSize: 18)),
@@ -112,7 +112,7 @@ class AddDoctorScreen extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  Icon(Icons.info_outline, color: accentColor, size: 20),
+                  const Icon(Icons.info_outline, color: accentColor, size: 20),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(

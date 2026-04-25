@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:medical_directory/screens/hospitals/hospital_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:medical_directory/screens/doctor_category_screen.dart';
+import 'package:medical_directory/screens/doctors/doctor_category_screen.dart';
 import 'package:medical_directory/main.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -62,7 +63,7 @@ class _HomeScreenState extends State<HomeScreen> {
               decoration: InputDecoration(
                 hintText: "Search for Doctor...",
                 hintStyle: TextStyle(color: isDark ? Colors.white38 : Colors.black38),
-                prefixIcon: Icon(Icons.search, color: primaryMint),
+                prefixIcon: const Icon(Icons.search, color: primaryMint),
                 filled: true,
                 fillColor: isDark ? Colors.grey[900] : Colors.grey[200],
                 border: OutlineInputBorder(
@@ -105,7 +106,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       );
                     }
                 ),
-                _buildCategoryCard(context, "Hospitals", FontAwesomeIcons.hospital, cardBg, isDark),
+                _buildCategoryCard(context, "Hospitals", FontAwesomeIcons.hospital, cardBg, isDark, 
+                onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const HospitalScreen()),
+                      );
+                    }),
                 _buildCategoryCard(context, "Pharmacy", FontAwesomeIcons.pills, cardBg, isDark),
                 _buildCategoryCard(context, "Dentistry", FontAwesomeIcons.tooth, cardBg, isDark),
               ],
@@ -113,7 +120,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
             const SizedBox(height: 30),
 
-            Text(
+            const Text(
               "Emergency Hotlines",
               style: TextStyle(
                   fontSize: 18,

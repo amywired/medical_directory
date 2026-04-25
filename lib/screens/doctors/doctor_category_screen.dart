@@ -39,7 +39,7 @@ class DoctorCategoryScreen extends StatelessWidget {
           ),
         ),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new, color: primaryMint),
+          icon: const Icon(Icons.arrow_back_ios_new, color: primaryMint),
           onPressed: () => Navigator.pop(context),
         ),
       ),
