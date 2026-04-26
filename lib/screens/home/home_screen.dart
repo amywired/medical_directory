@@ -4,6 +4,7 @@ import 'package:medical_directory/screens/hospitals/hospital_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:medical_directory/screens/doctors/doctor_category_screen.dart';
 import 'package:medical_directory/main.dart';
+import 'package:medical_directory/screens/pharmacy/pharmacy_list_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -106,14 +107,26 @@ class _HomeScreenState extends State<HomeScreen> {
                       );
                     }
                 ),
-                _buildCategoryCard(context, "Hospitals", FontAwesomeIcons.hospital, cardBg, isDark, 
+                _buildCategoryCard(context, "Hospitals", FontAwesomeIcons.hospital, cardBg, isDark,
                 onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => const HospitalScreen()),
                       );
                     }),
-                _buildCategoryCard(context, "Pharmacy", FontAwesomeIcons.pills, cardBg, isDark),
+                _buildCategoryCard(
+                    context,
+                    "Pharmacy",
+                    FontAwesomeIcons.pills,
+                    cardBg,
+                    isDark,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const PharmacyListScreen()),
+                      );
+                    }
+                ),
                 _buildCategoryCard(context, "Dentistry", FontAwesomeIcons.tooth, cardBg, isDark),
               ],
             ),
