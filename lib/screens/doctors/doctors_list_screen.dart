@@ -107,7 +107,7 @@ class _DoctorsListScreenState extends State<DoctorsListScreen> {
           // Doctors List
           Expanded(
             child: isLoading
-                ? Center(child: CircularProgressIndicator(color: primaryMint))
+                ? const Center(child: CircularProgressIndicator(color: primaryMint))
                 : filteredDoctors.isEmpty
                 ? Center(
               child: Text(
