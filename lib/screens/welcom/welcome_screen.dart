@@ -1,13 +1,54 @@
 import 'package:flutter/material.dart';
+import 'package:medical_directory/screens/custom_navigation_bar.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../main.dart';
-import '../home/home_screen.dart';
 
-class WelcomeScreen extends StatelessWidget {
+class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
 
-  // Function to launch WhatsApp, Email, or Phone
+  @override
+  State<WelcomeScreen> createState() => _WelcomeScreenState();
+}
+
+class _WelcomeScreenState extends State<WelcomeScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _logoScaleAnimation;
+  late Animation<double> _fadeAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    );
+
+    _logoScaleAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.easeOutBack,
+      ),
+    );
+
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: const Interval(0.5, 1.0, curve: Curves.easeIn),
+      ),
+    );
+
+    _animationController.forward();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
   Future<void> _launchSocial(String url) async {
     final Uri uri = Uri.parse(url);
     if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
@@ -41,105 +82,124 @@ class WelcomeScreen extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Circular Logo with Border
-                  Container(
-                    padding: const EdgeInsets.all(5),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: primaryMint, width: 3),
-                    ),
-                    child: const CircleAvatar(
-                      radius: 80,
-                      backgroundColor: Colors.transparent,
-                      backgroundImage: AssetImage('assets/logo.png'),
+                  // Logo Animation (Scale & Fade)
+                  ScaleTransition(
+                    scale: _logoScaleAnimation,
+                    child: FadeTransition(
+                      opacity: _logoScaleAnimation,
+                      child: Container(
+                        padding: const EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: primaryMint, width: 3),
+                        ),
+                        child: const CircleAvatar(
+                          radius: 80,
+                          backgroundColor: Colors.transparent,
+                          backgroundImage: AssetImage('assets/logo.png'),
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 30),
-                  Text(
-                    "MEDICAL DIRECTORY",
-                    style: TextStyle(
-                      color: textColor,
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 2,
-                    ),
-                  ),
-                  const Text(
-                    "MILA PROVINCE",
-                    style: TextStyle(
-                      color: primaryMint,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w300,
-                      letterSpacing: 4,
-                    ),
-                  ),
-                  const SizedBox(height: 50),
-                  // Enter Button
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 50),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const HomeScreen()),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: primaryMint,
-                        foregroundColor: Colors.black,
-                        minimumSize: const Size(double.infinity, 55),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
+
+                  // Text and Button Animation (Fade In)
+                  FadeTransition(
+                    opacity: _fadeAnimation,
+                    child: Column(
+                      children: [
+                        Text(
+                          "MEDICAL DIRECTORY",
+                          style: TextStyle(
+                            color: textColor,
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 2,
+                          ),
                         ),
-                        elevation: 5,
-                      ),
-                      child: const Text(
-                        "ENTER",
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
+                        const Text(
+                          "MILA PROVINCE",
+                          style: TextStyle(
+                            color: primaryMint,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w300,
+                            letterSpacing: 4,
+                          ),
+                        ),
+                        const SizedBox(height: 50),
+                        // Enter Button
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 50),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const CustomNavigationBar()),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: primaryMint,
+                              foregroundColor: Colors.black,
+                              minimumSize: const Size(double.infinity, 55),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              elevation: 5,
+                            ),
+                            child: const Text(
+                              "ENTER",
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
             ),
-            // Contact Buttons Section
-            Padding(
-              padding: const EdgeInsets.only(bottom: 30),
-              child: Column(
-                children: [
-                  Text(
-                    "Connect with Developer",
-                    style: TextStyle(
-                        color: isDark ? Colors.white54 : Colors.black54),
-                  ),
-                  const SizedBox(height: 15),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _socialIcon(
-                        icon: Icons.email,
-                        color: Colors.redAccent,
-                        onTap: () =>
-                            _launchSocial("mailto:benhaouechemina@gmail.com"),
-                      ),
-                      const SizedBox(width: 30),
-                      _socialIcon(
-                        icon: Icons.phone,
-                        color: Colors.blueAccent,
-                        onTap: () => _launchSocial("tel:0792614515"),
-                      ),
-                      const SizedBox(width: 30),
-                      _socialIcon(
-                        icon: FontAwesomeIcons.whatsapp,
-                        color: Colors.green,
-                        onTap: () =>
-                            _launchSocial("https://wa.me/213792614515"),
-                      ),
-                    ],
-                  ),
-                ],
+            // Contact Buttons Section Animation (Fade In)
+            FadeTransition(
+              opacity: _fadeAnimation,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 30),
+                child: Column(
+                  children: [
+                    Text(
+                      "Connect with Developer",
+                      style: TextStyle(
+                          color: isDark ? Colors.white54 : Colors.black54),
+                    ),
+                    const SizedBox(height: 15),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _socialIcon(
+                          icon: Icons.email,
+                          color: Colors.redAccent,
+                          onTap: () =>
+                              _launchSocial("mailto:benhaouechemina@gmail.com"),
+                        ),
+                        const SizedBox(width: 30),
+                        _socialIcon(
+                          icon: Icons.phone,
+                          color: Colors.blueAccent,
+                          onTap: () => _launchSocial("tel:0792614515"),
+                        ),
+                        const SizedBox(width: 30),
+                        _socialIcon(
+                          icon: FontAwesomeIcons.whatsapp,
+                          color: Colors.green,
+                          onTap: () =>
+                              _launchSocial("https://wa.me/213792614515"),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ],

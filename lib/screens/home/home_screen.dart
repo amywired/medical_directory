@@ -27,7 +27,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
-    final bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+    final bool isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
 
     // ألوان الديزاين الموحدة
     const Color primaryMint = Color(0xFF70FFD8);
@@ -48,7 +49,8 @@ class _HomeScreenState extends State<HomeScreen> {
         centerTitle: true,
         actions: [
           IconButton(
-            icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode, color: primaryMint),
+            icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode,
+                color: primaryMint),
             onPressed: () => MyApp.of(context).toggleTheme(),
           ),
         ],
@@ -63,7 +65,8 @@ class _HomeScreenState extends State<HomeScreen> {
               style: TextStyle(color: isDark ? Colors.white : Colors.black),
               decoration: InputDecoration(
                 hintText: "Search for Doctor...",
-                hintStyle: TextStyle(color: isDark ? Colors.white38 : Colors.black38),
+                hintStyle:
+                    TextStyle(color: isDark ? Colors.white38 : Colors.black38),
                 prefixIcon: const Icon(Icons.search, color: primaryMint),
                 filled: true,
                 fillColor: isDark ? Colors.grey[900] : Colors.grey[200],
@@ -80,8 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
               style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : Colors.black
-              ),
+                  color: isDark ? Colors.white : Colors.black),
             ),
             const SizedBox(height: 15),
 
@@ -94,40 +96,33 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisSpacing: 15,
               childAspectRatio: isLandscape ? 1.3 : 1.1,
               children: [
-                _buildCategoryCard(
+                _buildCategoryCard(context, "Doctors",
+                    FontAwesomeIcons.userDoctor, cardBg, isDark, onTap: () {
+                  Navigator.push(
                     context,
-                    "Doctors",
-                    FontAwesomeIcons.userDoctor,
-                    cardBg,
-                    isDark,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const DoctorCategoryScreen()),
-                      );
-                    }
-                ),
-                _buildCategoryCard(context, "Hospitals", FontAwesomeIcons.hospital, cardBg, isDark,
-                onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const HospitalScreen()),
-                      );
-                    }),
-                _buildCategoryCard(
+                    MaterialPageRoute(
+                        builder: (context) => const DoctorCategoryScreen()),
+                  );
+                }),
+                _buildCategoryCard(context, "Hospitals",
+                    FontAwesomeIcons.hospital, cardBg, isDark, onTap: () {
+                  Navigator.push(
                     context,
-                    "Pharmacy",
-                    FontAwesomeIcons.pills,
-                    cardBg,
-                    isDark,
+                    MaterialPageRoute(
+                        builder: (context) => const HospitalScreen()),
+                  );
+                }),
+                _buildCategoryCard(
+                    context, "Pharmacy", FontAwesomeIcons.pills, cardBg, isDark,
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const PharmacyListScreen()),
-                      );
-                    }
-                ),
-                _buildCategoryCard(context, "Dentistry", FontAwesomeIcons.tooth, cardBg, isDark),
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const PharmacyListScreen()),
+                  );
+                }),
+                _buildCategoryCard(context, "Dentistry", FontAwesomeIcons.tooth,
+                    cardBg, isDark),
               ],
             ),
 
@@ -138,47 +133,41 @@ class _HomeScreenState extends State<HomeScreen> {
               style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Colors.redAccent
-              ),
+                  color: Colors.redAccent),
             ),
             const SizedBox(height: 10),
 
             // قائمة الطوارئ تتوزع بشكل أفضل في الـ Landscape
             isLandscape
                 ? Row(
-              children: [
-                Expanded(child: _buildEmergencyItem("Protection Civile", "14", Colors.orange)),
-                const SizedBox(width: 10),
-                Expanded(child: _buildEmergencyItem("Police", "1548", Colors.blue)),
-              ],
-            )
+                    children: [
+                      Expanded(
+                          child: _buildEmergencyItem(
+                              "Protection Civile", "14", Colors.orange)),
+                      const SizedBox(width: 10),
+                      Expanded(
+                          child: _buildEmergencyItem(
+                              "Police", "1548", Colors.blue)),
+                    ],
+                  )
                 : Column(
-              children: [
-                _buildEmergencyItem("Protection Civile", "14", Colors.orange),
-                _buildEmergencyItem("Police", "1548", Colors.blue),
-              ],
-            ),
+                    children: [
+                      _buildEmergencyItem(
+                          "Protection Civile", "14", Colors.orange),
+                      _buildEmergencyItem("Police", "1548", Colors.blue),
+                    ],
+                  ),
             _buildEmergencyItem("Gendarmerie Nationale", "1055", Colors.green),
             _buildEmergencyItem("SAMU", "115", Colors.red),
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        backgroundColor: isDark ? Colors.black : Colors.white,
-        selectedItemColor: primaryMint,
-        unselectedItemColor: isDark ? Colors.white54 : Colors.black54,
-        onTap: (index) => setState(() => _selectedIndex = index),
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: "Home"),
-          BottomNavigationBarItem(icon: Icon(Icons.bookmark), label: "Saved"),
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: "Settings"),
-        ],
-      ),
     );
   }
 
-  Widget _buildCategoryCard(BuildContext context, String title, IconData icon, Color bg, bool isDark, {VoidCallback? onTap}) {
+  Widget _buildCategoryCard(
+      BuildContext context, String title, IconData icon, Color bg, bool isDark,
+      {VoidCallback? onTap}) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(20),
@@ -197,8 +186,7 @@ class _HomeScreenState extends State<HomeScreen> {
               title,
               style: TextStyle(
                   color: isDark ? Colors.white : Colors.black,
-                  fontWeight: FontWeight.bold
-              ),
+                  fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -217,8 +205,11 @@ class _HomeScreenState extends State<HomeScreen> {
           backgroundColor: iconColor.withOpacity(0.1),
           child: Icon(Icons.phone_forwarded, color: iconColor, size: 20),
         ),
-        title: Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
-        trailing: Text(phone, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)),
+        title: Text(label,
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+        trailing: Text(phone,
+            style: const TextStyle(
+                fontWeight: FontWeight.bold, color: Colors.blue)),
         onTap: () => _makeCall(phone),
       ),
     );
