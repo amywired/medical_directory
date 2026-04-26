@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'doctors_list_screen.dart';
 
 class DoctorCategoryScreen extends StatelessWidget {
   const DoctorCategoryScreen({super.key});
@@ -72,7 +73,14 @@ class DoctorCategoryScreen extends StatelessWidget {
                 return InkWell(
                   onTap: () {
                     // هنا رح تربطي مع صفحة زميلك (List of doctors)
-                    debugPrint("Selected: ${specialties[index]['name']}");
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => DoctorsListScreen(
+                          specialty: specialties[index]['name'],
+                        ),
+                      ),
+                    );
                   },
                   borderRadius: BorderRadius.circular(20),
                   child: Container(
