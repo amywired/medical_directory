@@ -17,18 +17,50 @@ class Sqldb {
     String databasePath = await getDatabasesPath();
     String path = join(databasePath, "Doctor.db");
     Database mydb = await openDatabase(path,
-        onCreate: _onCreate, version: 1, onUpgrade: _onUpgrade);
+        onCreate: _onCreate, version: 8, onUpgrade: _onUpgrade);
     return mydb;
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    // Handle database updates here
+    if (oldVersion < 3) {
+      await db.execute('''
+      CREATE TABLE Doctor_new (
+        id_doctor INTEGER PRIMARY KEY AUTOINCREMENT,
+        full_name TEXT,
+        medical_specialty TEXT,
+        commune TEXT,
+        district TEXT,
+        address TEXT,
+        phone_number TEXT,
+        professional_email TEXT UNIQUE,
+        appointment_phone INTEGER DEFAULT 0,
+        appointment_in_person INTEGER DEFAULT 0,
+        working_hours_from TEXT,
+        working_hours_to TEXT,
+        working_days TEXT,
+        facebook TEXT,
+        instagram TEXT
+      )
+    ''');
+    }
+    if (oldVersion < 8) {
+      await db.execute('''
+       CREATE TABLE "Pharmacy_3"(
+        "id_pharmacy" INTEGER PRIMARY KEY AUTOINCREMENT,
+        "name_pharmacy" TEXT NOT NULL,
+        "city" TEXT,
+        "location" TEXT
+      )
+    ''');
+     print("UPGRADE RUNNING");
+    }
+  
   }
 
   Future<void> _onCreate(Database db, int version) async {
     await db.execute('''
        CREATE TABLE "Doctor"(
-        "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+        "id_doctor" INTEGER PRIMARY KEY AUTOINCREMENT,
         "full_name" TEXT NOT NULL,
         "medical_specialty" TEXT NOT NULL,
         "commune" TEXT,
@@ -43,7 +75,25 @@ class Sqldb {
         "working_days" TEXT,
         "facebook" TEXT,
         "instagram" TEXT,
-        "created_at" TEXT
+      )
+    ''');
+    await db.execute('''
+       CREATE TABLE "Hospital"(
+        "id_Hospital" INTEGER PRIMARY KEY AUTOINCREMENT,
+        "type" TEXT NOT NULL,
+        "rating" REAL,
+        "reviews" iNTEGER,
+        "distance" TEXT,
+        "image" TEXT
+      )
+    ''');
+    await db.execute('''
+       CREATE TABLE "Pharmacy"(
+        "id_pharmacy" INTEGER PRIMARY KEY AUTOINCREMENT,
+        "name_pharmacy" TEXT NOT NULL,
+        "city" TEXT,
+        "location" TEXT,
+        "phone" TEXT,
       )
     ''');
   }

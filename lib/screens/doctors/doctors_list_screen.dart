@@ -24,12 +24,16 @@ class _DoctorsListScreenState extends State<DoctorsListScreen> {
     fetchDoctors();
   }
 
+  Future<List<Map>> readData() async {
+    List<Map> response = await sqlDb.readData("SELECT * FROM Doctor_new");
+    return response;
+  }
+
   // Fetch doctors from the SQLite database based on the selected specialty
   Future<void> fetchDoctors() async {
     // Read from the "Doctor" table defined in your SqlDb.dart
     List<Map<String, dynamic>> response = await sqlDb.readData(
-        "SELECT * FROM Doctor WHERE specialty = '${widget.specialty}'"
-    );
+        "SELECT * FROM Doctor_new WHERE medical_specialty = '${widget.specialty}'");
 
     setState(() {
       doctors = response;
@@ -45,10 +49,10 @@ class _DoctorsListScreenState extends State<DoctorsListScreen> {
         filteredDoctors = doctors;
       } else {
         filteredDoctors = doctors
-            .where((doc) => doc['name']
-            .toString()
-            .toLowerCase()
-            .contains(query.toLowerCase()))
+            .where((doc) => doc['full_name']
+                .toString()
+                .toLowerCase()
+                .contains(query.toLowerCase()))
             .toList();
       }
     });
@@ -73,7 +77,8 @@ class _DoctorsListScreenState extends State<DoctorsListScreen> {
         iconTheme: IconThemeData(color: isDark ? primaryMint : Colors.black),
         actions: [
           IconButton(
-            icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode, color: primaryMint),
+            icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode,
+                color: primaryMint),
             onPressed: () => MyApp.of(context).toggleTheme(),
           ),
         ],
@@ -94,81 +99,84 @@ class _DoctorsListScreenState extends State<DoctorsListScreen> {
                 fillColor: isDark ? const Color(0xFF2C3633) : Colors.white,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(30),
-                  borderSide: BorderSide(color: isDark ? Colors.white10 : Colors.black12),
+                  borderSide: BorderSide(
+                      color: isDark ? Colors.white10 : Colors.black12),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(30),
-                  borderSide: BorderSide(color: isDark ? Colors.white10 : Colors.black12),
+                  borderSide: BorderSide(
+                      color: isDark ? Colors.white10 : Colors.black12),
                 ),
               ),
             ),
           ),
 
-          // Doctors List
           Expanded(
             child: isLoading
-                ? const Center(child: CircularProgressIndicator(color: primaryMint))
-                : filteredDoctors.isEmpty
-                ? Center(
-              child: Text(
-                "No doctors found for this specialty.",
-                style: TextStyle(color: textColor),
-              ),
-            )
+                ? const Center(child: CircularProgressIndicator())
                 : ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: filteredDoctors.length,
-              itemBuilder: (context, index) {
-                final doc = filteredDoctors[index];
-                return Card(
-                  color: cardBg,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: filteredDoctors.length,
+                    itemBuilder: (context, index) {
+                      final doctor = filteredDoctors[index];
+
+                      return Card(
+                        color: cardBg,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        margin: const EdgeInsets.only(bottom: 12),
+                        child: ListTile(
+                          leading: CircleAvatar(
+                            backgroundColor:
+                                const Color(0xFF00BFA5).withOpacity(0.2),
+                            child: const Icon(Icons.person,
+                                color: Color(0xFF00BFA5)),
+                          ),
+                          title: Text(
+                            "${doctor["full_name"]}",
+                            style: TextStyle(
+                                color: textColor, fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "${doctor["medical_specialty"]}",
+                                style: const TextStyle(color: Colors.grey),
+                              ),
+                              const SizedBox(height: 4),
+                              Row(
+                                children: [
+                                  const Icon(Icons.location_on,
+                                      size: 14, color: Colors.grey),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    "${doctor["address"]}",
+                                    style: const TextStyle(
+                                        color: Colors.grey, fontSize: 12),
+                                  ),
+                                ],
+                              )
+                            ],
+                          ),
+                          
+                          trailing: IconButton(
+                            icon: const Icon(Icons.phone, color: Colors.green),
+                            onPressed: () {},
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                  margin: const EdgeInsets.only(bottom: 12),
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: const Color(0xFF00BFA5).withOpacity(0.2),
-                      child: const Icon(Icons.person, color: Color(0xFF00BFA5)),
-                    ),
-                    title: Text(
-                      doc['name'],
-                      style: TextStyle(
-                          color: textColor,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(doc['specialty'], style: const TextStyle(color: Colors.grey)),
-                        const SizedBox(height: 4),
-                        Row(
-                          children: [
-                            const Icon(Icons.location_on, size: 14, color: Colors.grey),
-                            const SizedBox(width: 4),
-                            Text(doc['Location'], style: const TextStyle(color: Colors.grey, fontSize: 12)),
-                          ],
-                        )
-                      ],
-                    ),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.phone, color: Colors.green),
-                      onPressed: () {
-                        // Can add phone launch logic here later using doc['Phone']
-                      },
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
+          )
         ],
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color(0xFF00BFA5),
         onPressed: () {
           // Navigate to the Add Doctor Screen your teammate made
-          Navigator.push(
+          Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => const AddDoctorScreen()),
           ).then((value) {
