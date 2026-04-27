@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 Widget buildOption(
     {required String title,
     required bool value,
-    required Function(bool?) onChanged}) {
+    required Function(bool?) onChanged ,}) {
   return Expanded(
       child: GestureDetector(
     onTap: () {

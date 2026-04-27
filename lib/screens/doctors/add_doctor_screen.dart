@@ -2,8 +2,10 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:medical_directory/Database/SqlDb.dart';
 import 'package:medical_directory/main.dart';
 import 'package:medical_directory/screens/doctors/OptionChoice.dart';
+import 'package:medical_directory/screens/doctors/doctors_list_screen.dart';
 
 class AddDoctorScreen extends StatefulWidget {
   const AddDoctorScreen({super.key});
@@ -13,8 +15,22 @@ class AddDoctorScreen extends StatefulWidget {
 }
 
 class _AddDoctorScreenState extends State<AddDoctorScreen> {
+  Sqldb sqlDb = Sqldb();
   TimeOfDay fromTime = const TimeOfDay(hour: 9, minute: 0);
   TimeOfDay toTime = const TimeOfDay(hour: 17, minute: 0);
+
+  TextEditingController nameController = TextEditingController();
+  TextEditingController specialtyController = TextEditingController();
+  TextEditingController communeController = TextEditingController();
+  TextEditingController districtController = TextEditingController();
+  TextEditingController addressController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
+  TextEditingController facebookController = TextEditingController();
+  TextEditingController instagramController = TextEditingController();
+  TextEditingController fromTimeController = TextEditingController();
+  TextEditingController toTimeController = TextEditingController();
+  TextEditingController workingDaysController = TextEditingController();
 
   final List<String> days = [
     "Monday",
@@ -48,14 +64,14 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
   bool inPerson = false;
   String? selectedValue = "Cardiology";
   final List<String> items = [
+    "Generalist",
     "Cardiology",
-    "Dermatology",
-    "Neurology",
     "Pediatrics",
-    "Psychiatry",
+    "Neurology",
+    "Orthopedics",
     "Radiology",
-    "Surgery",
-    "Urology"
+    "Ophthalmology",
+    "Dermatology"
   ];
 
   File? imageFile;
@@ -77,685 +93,376 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
     final Color textColorDim =
         isDark ? const Color(0xFF9EAAA7) : Colors.grey[600]!;
 
-    return isLandscape
-        ? Scaffold(
-            backgroundColor: backgroundColor,
-            appBar: AppBar(
-              backgroundColor: backgroundColor,
-              elevation: 0,
-              leading: IconButton(
-                icon: Icon(Icons.arrow_back, color: accentColor),
-                onPressed: () => Navigator.pop(context),
-              ),
-              title: Text('Add Doctor',
-                  style: TextStyle(color: textColorMain, fontSize: 18)),
-              actions: [
-                IconButton(
-                  icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode,
-                      color: textColorMain),
-                  onPressed: () => MyApp.of(context).toggleTheme(),
-                ),
-                IconButton(
-                    onPressed: () {},
-                    icon: Icon(Icons.more_vert, color: textColorMain))
-              ],
-            ),
-            body: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+    return Scaffold(
+      backgroundColor: backgroundColor,
+      appBar: AppBar(
+        backgroundColor: backgroundColor,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: accentColor),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text('Add Doctor',
+            style: TextStyle(color: textColorMain, fontSize: 18)),
+        actions: [
+          IconButton(
+            icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode,
+                color: textColorMain),
+            onPressed: () => MyApp.of(context).toggleTheme(),
+          ),
+          IconButton(
+              onPressed: () {},
+              icon: Icon(Icons.more_vert, color: textColorMain))
+        ],
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 15),
+            Container(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const SizedBox(height: 15),
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                  InkWell(
+                    onTap: () async {
+                      final piker = await ImagePicker()
+                          .pickImage(source: ImageSource.gallery);
+                      if (piker != null) {
+                        setState(() {
+                          imageFile = File(piker.path);
+                        });
+                      }
+                    },
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        InkWell(
-                          onTap: () async {
-                            final piker = await ImagePicker()
-                                .pickImage(source: ImageSource.gallery);
-                            if (piker != null) {
-                              setState(() {
-                                imageFile = File(piker.path);
-                              });
-                            }
-                          },
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Container(
-                                width: 100,
-                                height: 100,
-                                decoration: BoxDecoration(
-                                    color: isDark
-                                        ? const Color(0xFF2C3633)
-                                        : Colors.grey[200],
-                                    shape: BoxShape.circle,
-                                    image: imageFile != null
-                                        ? DecorationImage(
-                                            image: FileImage(imageFile!),
-                                            fit: BoxFit.cover)
-                                        : null),
-                                child: imageFile == null
-                                    ? const Icon(Icons.camera_alt_outlined,
-                                        color: Colors.grey, size: 30)
-                                    : null,
-                              ),
-                              const SizedBox(height: 8),
-                              Text("Add Photo",
-                                  style: TextStyle(
-                                      color: textColorDim, fontSize: 15)),
-                            ],
-                          ),
+                        Container(
+                          width: 100,
+                          height: 100,
+                          decoration: BoxDecoration(
+                              color: isDark
+                                  ? const Color(0xFF2C3633)
+                                  : Colors.grey[200],
+                              shape: BoxShape.circle,
+                              image: imageFile != null
+                                  ? DecorationImage(
+                                      image: FileImage(imageFile!),
+                                      fit: BoxFit.cover)
+                                  : null),
+                          child: imageFile == null
+                              ? const Icon(Icons.camera_alt_outlined,
+                                  color: Colors.grey, size: 30)
+                              : null,
                         ),
+                        const SizedBox(height: 8),
+                        Text("Add Photo",
+                            style:
+                                TextStyle(color: textColorDim, fontSize: 15)),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 6),
-                  Container(
-                    padding: const EdgeInsets.all(9),
-                    width: 550,
-                    decoration: BoxDecoration(
-                      color: const Color.fromARGB(31, 143, 103, 103),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _buildLabel("FULL NAME", textColorDim, 12),
-                          _buildTextField("Dr. Julian Sterling", inputFillColor,
-                              textColorMain, textColorDim, accentColor),
-                          _buildLabel("Medical Speciality", textColorDim, 15),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            width: 310,
-                            margin: const EdgeInsets.only(bottom: 5, left: 10),
-                            decoration: BoxDecoration(
-                              color: Colors.grey[800],
-                              borderRadius: BorderRadius.circular(13),
-                            ),
-                            child: DropdownButtonHideUnderline(
-                                child: DropdownButton<String>(
-                                    value: selectedValue,
-                                    isExpanded: true,
-                                    dropdownColor: isDark
-                                        ? const Color(0xFF2C3633)
-                                        : Colors.white,
-                                    icon: Icon(Icons.arrow_drop_down,
-                                        color: accentColor),
-                                    style: TextStyle(
-                                        color: textColorMain, fontSize: 14),
-                                    items: items.map((item) {
-                                      return DropdownMenuItem<String>(
-                                        value: item,
-                                        child: Text(item),
-                                      );
-                                    }).toList(),
-                                    onChanged: (String? newValue) {
-                                      setState(() {
-                                        selectedValue = newValue;
-                                      });
-                                    })),
-                          ),
-                          Row(
-                            children: [
-                              Column(
-                                children: [
-                                  Container(
-                                      margin: const EdgeInsets.only(right: 80),
-                                      child: _buildLabel(
-                                          "Commune", textColorDim, 15)),
-                                  _buildTextFieldMin(
-                                    "e.g.. Mila",
-                                    inputFillColor,
-                                    textColorMain,
-                                    textColorDim,
-                                    accentColor,
-                                  ),
-                                ],
-                              ),
-                              Column(
-                                children: [
-                                  Container(
-                                    margin: const EdgeInsets.only(right: 90),
-                                    child: _buildLabel(
-                                        "District", textColorDim, 15),
-                                  ),
-                                  _buildTextFieldMin(
-                                    "e.g.. Mila",
-                                    inputFillColor,
-                                    textColorMain,
-                                    textColorDim,
-                                    accentColor,
-                                  ),
-                                ],
-                              )
-                            ],
-                          ),
-                          const SizedBox(height: 2),
-                          _buildLabel("ADDRESS", textColorDim, 15),
-                          _buildTextField(
-                            "Address",
-                            inputFillColor,
-                            textColorMain,
-                            textColorDim,
-                            accentColor,
-                          ),
-                          const SizedBox(height: 7),
-                          _buildLabel("PROFESSIONEL EMAIL", textColorDim, 12),
-                          _buildTextField(
-                            "doctor.email@clinic.com",
-                            inputFillColor,
-                            textColorMain,
-                            textColorDim,
-                            accentColor,
-                          ),
-                          _buildLabel("PHONE NUMBER", textColorDim, 12),
-                          _buildTextField(
-                            "+213 050000000000",
-                            inputFillColor,
-                            textColorMain,
-                            textColorDim,
-                            accentColor,
-                          ),
-                          const SizedBox(height: 10),
-                          _buildLabel("APPOINTMENT METHOD", textColorDim, 12),
-                          Row(
-                            children: [
-                              buildOption(
-                                  title: "Phone",
-                                  value: Phone,
-                                  onChanged: (val) {
-                                    setState(() {
-                                      Phone = val ?? false;
-                                      if (Phone) {
-                                        inPerson = false;
-                                      }
-                                    });
-                                  }),
-                              buildOption(
-                                  title: "In Person",
-                                  value: inPerson,
-                                  onChanged: (val) {
-                                    setState(() {
-                                      inPerson = val ?? false;
-                                      if (inPerson) {
-                                        Phone = false;
-                                      }
-                                    });
-                                  })
-                            ],
-                          ),
-                          _buildLabel("WORKING HOURS", textColorDim, 12),
-                          Container(
-                            padding: const EdgeInsets.all(7),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                builTimebox("From", fromTime, true),
-                                const SizedBox(width: 20),
-                                builTimebox("To", toTime, false)
-                              ],
-                            ),
-                          ),
-                          _buildLabel("WORKING DAYS", textColorDim, 12),
-                          Container(
-                            padding: const EdgeInsets.all(9),
-                            child: GridView.builder(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              gridDelegate:
-                                  const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 3,
-                                childAspectRatio: 3,
-                                mainAxisSpacing: 10,
-                                crossAxisSpacing: 10,
-                              ),
-                              itemCount: days.length,
-                              itemBuilder: (context, index) {
-                                String day = days[index];
-                                bool isSelected = selectedDays.contains(day);
-                                return GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      isSelected
-                                          ? selectedDays.remove(day)
-                                          : selectedDays.add(day);
-                                    });
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: isSelected
-                                          ? accentColor.withOpacity(0.7)
-                                          : Colors.grey[800],
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    alignment: Alignment.center,
-                                    child: Text(day,
-                                        style: TextStyle(
-                                            color: isSelected
-                                                ? Colors.black
-                                                : textColorDim,
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w600)),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        ]),
-                  ),
-                  const SizedBox(height: 15),
-                  Container(
-                      width: 400,
-                      height: 150,
-                      decoration: BoxDecoration(
-                        color: cardColor,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        children: [
-                          Container(
-                              margin: const EdgeInsets.only(right: 230),
-                              child: _buildLabel(
-                                  "SOCILA NETWORK", textColorDim, 12)),
-                          Container(
-                              margin: const EdgeInsets.symmetric(horizontal: 5),
-                              padding: const EdgeInsets.all(4),
-                              child: Column(
-                                children: [
-                                  buildContactfield(
-                                    "Facebook",
-                                    inputFillColor,
-                                    textColorMain,
-                                    textColorDim,
-                                    accentColor,
-                                    icon: Icons.facebook,
-                                  ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  buildContactfield("Instagram", inputFillColor,
-                                      textColorMain, textColorDim, accentColor,
-                                      icon: Icons.social_distance),
-                                ],
-                              )),
-                        ],
-                      )),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  const SizedBox(height: 30),
-                  Center(
-                    child: ElevatedButton.icon(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF2E353D),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 24, vertical: 16),
-                        shape: const StadiumBorder(),
-                        shadowColor: Colors.black45,
-                        elevation: 5,
-                      ),
-                      label: const Text(
-                        "Add Doctor",
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: Color(0xFFABC4FF)),
-                      ),
-                      icon: const Icon(
-                        Icons.arrow_forward,
-                        size: 20,
-                        color: Color(0xFFABC4FF),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 30),
                 ],
               ),
             ),
-          )
-        : Scaffold(
-            backgroundColor: backgroundColor,
-            appBar: AppBar(
-              backgroundColor: backgroundColor,
-              elevation: 0,
-              leading: IconButton(
-                icon: Icon(Icons.arrow_back, color: accentColor),
-                onPressed: () => Navigator.pop(context),
+            const SizedBox(height: 6),
+            Container(
+              padding: const EdgeInsets.all(9),
+              width: 550,
+              decoration: BoxDecoration(
+                color: const Color.fromARGB(31, 143, 103, 103),
+                borderRadius: BorderRadius.circular(12),
               ),
-              title: Text('Add Doctor',
-                  style: TextStyle(color: textColorMain, fontSize: 18)),
-              actions: [
-                IconButton(
-                  icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode,
-                      color: textColorMain),
-                  onPressed: () => MyApp.of(context).toggleTheme(),
-                ),
-                IconButton(
-                    onPressed: () {},
-                    icon: Icon(Icons.more_vert, color: textColorMain))
-              ],
-            ),
-            body: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 15),
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildLabel("FULL NAME", textColorDim, 12),
+                    _buildTextField("Dr. Julian Sterling", inputFillColor,
+                        textColorMain, textColorDim, accentColor,
+                        controller: nameController),
+                    _buildLabel("Medical Speciality", textColorDim, 15),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      width: 310,
+                      margin: const EdgeInsets.only(bottom: 5, left: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[800],
+                        borderRadius: BorderRadius.circular(13),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                              value: selectedValue,
+                              isExpanded: true,
+                              dropdownColor: isDark
+                                  ? const Color(0xFF2C3633)
+                                  : Colors.white,
+                              icon: Icon(Icons.arrow_drop_down,
+                                  color: accentColor),
+                              style:
+                                  TextStyle(color: textColorMain, fontSize: 14),
+                              items: items.map((item) {
+                                return DropdownMenuItem<String>(
+                                  value: item,
+                                  child: Text(item),
+                                );
+                              }).toList(),
+                              onChanged: (String? newValue) {
+                                setState(() {
+                                  selectedValue = newValue;
+                                });
+                              })),
+                    ),
+                    Row(
                       children: [
-                        InkWell(
-                          onTap: () async {
-                            final piker = await ImagePicker()
-                                .pickImage(source: ImageSource.gallery);
-                            if (piker != null) {
-                              setState(() {
-                                imageFile = File(piker.path);
-                              });
-                            }
-                          },
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Container(
-                                width: 100,
-                                height: 100,
-                                decoration: BoxDecoration(
-                                    color: isDark
-                                        ? const Color(0xFF2C3633)
-                                        : Colors.grey[200],
-                                    shape: BoxShape.circle,
-                                    image: imageFile != null
-                                        ? DecorationImage(
-                                            image: FileImage(imageFile!),
-                                            fit: BoxFit.cover)
-                                        : null),
-                                child: imageFile == null
-                                    ? const Icon(Icons.camera_alt_outlined,
-                                        color: Colors.grey, size: 30)
-                                    : null,
-                              ),
-                              const SizedBox(height: 8),
-                              Text("Add Photo",
-                                  style: TextStyle(
-                                      color: textColorDim, fontSize: 15)),
-                            ],
-                          ),
+                        Column(
+                          children: [
+                            Container(
+                                margin: const EdgeInsets.only(right: 80),
+                                child:
+                                    _buildLabel("Commune", textColorDim, 15)),
+                            _buildTextFieldMin("e.g.. Mila", inputFillColor,
+                                textColorMain, textColorDim, accentColor,
+                                controller: communeController),
+                          ],
                         ),
+                        Column(
+                          children: [
+                            Container(
+                              margin: const EdgeInsets.only(right: 90),
+                              child: _buildLabel("District", textColorDim, 15),
+                            ),
+                            _buildTextFieldMin(
+                              "e.g.. Mila",
+                              inputFillColor,
+                              textColorMain,
+                              textColorDim,
+                              accentColor,
+                              controller: districtController,
+                            ),
+                          ],
+                        )
                       ],
                     ),
-                  ),
-                  const SizedBox(height: 6),
-                  Container(
-                    padding: const EdgeInsets.all(9),
-                    width: 550,
-                    decoration: BoxDecoration(
-                      color: const Color.fromARGB(31, 143, 103, 103),
-                      borderRadius: BorderRadius.circular(12),
+                    const SizedBox(height: 2),
+                    _buildLabel("ADDRESS", textColorDim, 15),
+                    _buildTextField(
+                      "Address",
+                      inputFillColor,
+                      textColorMain,
+                      textColorDim,
+                      accentColor,
+                      controller: addressController,
                     ),
-                    child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                    const SizedBox(height: 7),
+                    _buildLabel("PROFESSIONEL EMAIL", textColorDim, 12),
+                    _buildTextField(
+                      "doctor.email@clinic.com",
+                      inputFillColor,
+                      textColorMain,
+                      textColorDim,
+                      accentColor,
+                      controller: emailController,
+                    ),
+                    _buildLabel("PHONE NUMBER", textColorDim, 12),
+                    _buildTextField(
+                      "+213 050000000000",
+                      inputFillColor,
+                      textColorMain,
+                      textColorDim,
+                      accentColor,
+                      controller: phoneController,
+                    ),
+                    const SizedBox(height: 10),
+                    _buildLabel("APPOINTMENT METHOD", textColorDim, 12),
+                    Row(
+                      children: [
+                        buildOption(
+                            title: "Phone",
+                            value: Phone,
+                            onChanged: (val) {
+                              setState(() {
+                                Phone = val ?? false;
+                                if (Phone) {
+                                  inPerson = false;
+                                }
+                              });
+                            }),
+                        buildOption(
+                            title: "In Person",
+                            value: inPerson,
+                            onChanged: (val) {
+                              setState(() {
+                                inPerson = val ?? false;
+                                if (inPerson) {
+                                  Phone = false;
+                                }
+                              });
+                            })
+                      ],
+                    ),
+                    _buildLabel("WORKING HOURS", textColorDim, 12),
+                    Container(
+                      padding: const EdgeInsets.all(7),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          _buildLabel("FULL NAME", textColorDim, 12),
-                          _buildTextField("Dr. Julian Sterling", inputFillColor,
-                              textColorMain, textColorDim, accentColor),
-                          _buildLabel("Medical Speciality", textColorDim, 15),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            width: 310,
-                            margin: const EdgeInsets.only(bottom: 5, left: 10),
-                            decoration: BoxDecoration(
-                              color: Colors.grey[800],
-                              borderRadius: BorderRadius.circular(13),
-                            ),
-                            child: DropdownButtonHideUnderline(
-                                child: DropdownButton<String>(
-                                    value: selectedValue,
-                                    isExpanded: true,
-                                    dropdownColor: Colors.grey[900],
-                                    icon: Icon(Icons.arrow_drop_down,
-                                        color: accentColor),
-                                    style: TextStyle(
-                                        color: textColorMain, fontSize: 14),
-                                    items: items.map((item) {
-                                      return DropdownMenuItem<String>(
-                                        value: item,
-                                        child: Text(item),
-                                      );
-                                    }).toList(),
-                                    onChanged: (String? newValue) {
-                                      setState(() {
-                                        selectedValue = newValue;
-                                      });
-                                    })),
-                          ),
-                          Row(
-                            children: [
-                              Column(
-                                children: [
-                                  Container(
-                                      margin: const EdgeInsets.only(right: 80),
-                                      child: _buildLabel(
-                                          "Commune", textColorDim, 15)),
-                                  _buildTextFieldMin(
-                                    "e.g.. Mila",
-                                    inputFillColor,
-                                    textColorMain,
-                                    textColorDim,
-                                    accentColor,
-                                  ),
-                                ],
-                              ),
-                              Column(
-                                children: [
-                                  Container(
-                                    margin: const EdgeInsets.only(right: 90),
-                                    child: _buildLabel(
-                                        "District", textColorDim, 15),
-                                  ),
-                                  _buildTextFieldMin(
-                                    "e.g.. Mila",
-                                    inputFillColor,
-                                    textColorMain,
-                                    textColorDim,
-                                    accentColor,
-                                  ),
-                                ],
-                              )
-                            ],
-                          ),
-                          const SizedBox(height: 2),
-                          _buildLabel("ADDRESS", textColorDim, 15),
-                          _buildTextField(
-                            "Address",
-                            inputFillColor,
-                            textColorMain,
-                            textColorDim,
-                            accentColor,
-                          ),
-                          const SizedBox(height: 7),
-                          _buildLabel("PROFESSIONEL EMAIL", textColorDim, 12),
-                          _buildTextField(
-                            "doctor.email@clinic.com",
-                            inputFillColor,
-                            textColorMain,
-                            textColorDim,
-                            accentColor,
-                          ),
-                          _buildLabel("PHONE NUMBER", textColorDim, 12),
-                          _buildTextField(
-                            "+213 050000000000",
-                            inputFillColor,
-                            textColorMain,
-                            textColorDim,
-                            accentColor,
-                          ),
-                          const SizedBox(height: 10),
-                          _buildLabel("APPOINTMENT METHOD", textColorDim, 12),
-                          Row(
-                            children: [
-                              buildOption(
-                                  title: "Phone",
-                                  value: Phone,
-                                  onChanged: (val) {
-                                    setState(() {
-                                      Phone = val ?? false;
-                                      if (Phone) {
-                                        inPerson = false;
-                                      }
-                                    });
-                                  }),
-                              buildOption(
-                                  title: "In Person",
-                                  value: inPerson,
-                                  onChanged: (val) {
-                                    setState(() {
-                                      inPerson = val ?? false;
-                                      if (inPerson) {
-                                        Phone = false;
-                                      }
-                                    });
-                                  })
-                            ],
-                          ),
-                          _buildLabel("WORKING HOURS", textColorDim, 12),
-                          Container(
-                            padding: const EdgeInsets.all(7),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                builTimebox("From", fromTime, true),
-                                const SizedBox(width: 20),
-                                builTimebox("To", toTime, false)
-                              ],
-                            ),
-                          ),
-                          _buildLabel("WORKING DAYS", textColorDim, 12),
-                          Container(
-                            padding: const EdgeInsets.all(9),
-                            child: GridView.builder(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              gridDelegate:
-                                  const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 3,
-                                childAspectRatio: 3,
-                                mainAxisSpacing: 10,
-                                crossAxisSpacing: 10,
-                              ),
-                              itemCount: days.length,
-                              itemBuilder: (context, index) {
-                                String day = days[index];
-                                bool isSelected = selectedDays.contains(day);
-                                return GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      isSelected
-                                          ? selectedDays.remove(day)
-                                          : selectedDays.add(day);
-                                    });
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: isSelected
-                                          ? accentColor.withOpacity(0.7)
-                                          : Colors.grey[800],
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    alignment: Alignment.center,
-                                    child: Text(day,
-                                        style: TextStyle(
-                                            color: isSelected
-                                                ? Colors.black
-                                                : textColorDim,
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w600)),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        ]),
-                  ),
-                  const SizedBox(height: 15),
-                  Container(
-                      width: 400,
-                      height: 150,
-                      decoration: BoxDecoration(
-                        color: cardColor,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        children: [
-                          Container(
-                              margin: const EdgeInsets.only(right: 230),
-                              child: _buildLabel(
-                                  "SOCILA NETWORK", textColorDim, 12)),
-                          Container(
-                              margin: const EdgeInsets.symmetric(horizontal: 5),
-                              padding: const EdgeInsets.all(4),
-                              child: Column(
-                                children: [
-                                  buildContactfield(
-                                    "Facebook",
-                                    inputFillColor,
-                                    textColorMain,
-                                    textColorDim,
-                                    accentColor,
-                                    icon: Icons.facebook,
-                                  ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  buildContactfield("Instagram", inputFillColor,
-                                      textColorMain, textColorDim, accentColor,
-                                      icon: Icons.social_distance),
-                                ],
-                              )),
+                          builTimebox("From", fromTime, true,
+                              controller: fromTimeController),
+                          const SizedBox(width: 20),
+                          builTimebox("To", toTime, false,
+                              controller: toTimeController)
                         ],
-                      )),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  const SizedBox(height: 30),
-                  Center(
-                    child: ElevatedButton.icon(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF2E353D),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 24, vertical: 16),
-                        shape: const StadiumBorder(),
-                        shadowColor: Colors.black45,
-                        elevation: 5,
-                      ),
-                      label: const Text(
-                        "Add Doctor",
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: Color(0xFFABC4FF)),
-                      ),
-                      icon: const Icon(
-                        Icons.arrow_forward,
-                        size: 20,
-                        color: Color(0xFFABC4FF),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 30),
-                ],
+                    _buildLabel("WORKING DAYS", textColorDim, 12),
+                    Container(
+                      padding: const EdgeInsets.all(9),
+                      child: GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          childAspectRatio: 3,
+                          mainAxisSpacing: 10,
+                          crossAxisSpacing: 10,
+                        ),
+                        itemCount: days.length,
+                        itemBuilder: (context, index) {
+                          String day = days[index];
+                          bool isSelected = selectedDays.contains(day);
+                          return GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                isSelected
+                                    ? selectedDays.remove(day)
+                                    : selectedDays.add(day);
+                              });
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? accentColor.withOpacity(0.7)
+                                    : Colors.grey[800],
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              alignment: Alignment.center,
+                              child: Text(day,
+                                  style: TextStyle(
+                                      color: isSelected
+                                          ? Colors.black
+                                          : textColorDim,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600)),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ]),
+            ),
+            const SizedBox(height: 15),
+            Container(
+                width: 400,
+                height: 150,
+                decoration: BoxDecoration(
+                  color: cardColor,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  children: [
+                    Container(
+                        margin: const EdgeInsets.only(right: 230),
+                        child: _buildLabel("SOCILA NETWORK", textColorDim, 12)),
+                    Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 5),
+                        padding: const EdgeInsets.all(4),
+                        child: Column(
+                          children: [
+                            buildContactfield(
+                              "Facebook",
+                              inputFillColor,
+                              textColorMain,
+                              textColorDim,
+                              accentColor,
+                              icon: Icons.facebook,
+                              controller: facebookController,
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            buildContactfield("Instagram", inputFillColor,
+                                textColorMain, textColorDim, accentColor,
+                                icon: Icons.social_distance,
+                                controller: instagramController),
+                          ],
+                        )),
+                  ],
+                )),
+            const SizedBox(
+              height: 10,
+            ),
+            const SizedBox(height: 30),
+            Center(
+              child: ElevatedButton.icon(
+                onPressed: () async {
+                  int? response = await sqlDb.insertData('''
+                      INSERT INTO Doctor_new (`full_name` , `medical_specialty` , `commune` , `district`, `address`, `phone_number`, `professional_email`, `appointment_phone`, `appointment_in_person`, `working_hours_from`, `working_hours_to`, `working_days`, `facebook`, `instagram`) 
+                            
+                            VALUES   ("${nameController.text}",
+                                       "${selectedValue}",
+                                      "${communeController.text}",
+                                      "${districtController.text}",
+                                      "${addressController.text}",
+                                      "${phoneController.text}",
+                                      "${emailController.text}",
+                                      "${Phone ? 1 : 0}",
+                                      "${inPerson ? 1 : 0}",
+                                      "${fromTime.format(context)}",
+                                      "${toTime.format(context)}",
+                                      "${selectedDays.join(', ')}",
+                                      "${facebookController.text}",
+                                      "${instagramController.text}"
+                                    )
+                            
+                            ''');
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => DoctorsListScreen(
+                            specialty: "${selectedValue}",
+                          )));
+
+                  print(response);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF2E353D),
+                  foregroundColor: Colors.white,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                  shape: const StadiumBorder(),
+                  shadowColor: Colors.black45,
+                  elevation: 5,
+                ),
+                label: const Text(
+                  "Add Doctor",
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFFABC4FF)),
+                ),
+                icon: const Icon(
+                  Icons.arrow_forward,
+                  size: 20,
+                  color: Color(0xFFABC4FF),
+                ),
               ),
             ),
-          );
+            const SizedBox(height: 30),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildLabel(String label, Color color, double fontSize) {
@@ -769,10 +476,13 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
 
   Widget _buildTextField(
       String hint, Color fill, Color text, Color hintCol, Color acc,
-      {IconData? icon, int maxLines = 1}) {
+      {IconData? icon,
+      int maxLines = 1,
+      required TextEditingController controller}) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: TextField(
+        controller: controller,
         maxLines: maxLines,
         style: TextStyle(color: text),
         decoration: InputDecoration(
@@ -793,13 +503,21 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
   }
 
   Widget _buildTextFieldMin(
-      String hint, Color fill, Color text, Color hintCol, Color acc,
-      {IconData? icon, int maxLines = 1}) {
+    String hint,
+    Color fill,
+    Color text,
+    Color hintCol,
+    Color acc, {
+    IconData? icon,
+    int maxLines = 1,
+    required TextEditingController controller,
+  }) {
     return SizedBox(
       width: 160,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10),
         child: TextField(
+          controller: controller,
           maxLines: maxLines,
           style: TextStyle(color: text),
           decoration: InputDecoration(
@@ -820,7 +538,8 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
     );
   }
 
-  Widget builTimebox(String label, TimeOfDay time, bool isForm) {
+  Widget builTimebox(String label, TimeOfDay time, bool isForm,
+      {required TextEditingController controller}) {
     return SizedBox(
       width: 145,
       child: GestureDetector(
@@ -854,13 +573,16 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
 
   Widget buildContactfield(
       String hint, Color fill, Color text, Color hintCol, Color acc,
-      {IconData? icon, int maxLines = 1}) {
+      {IconData? icon,
+      int maxLines = 1,
+      required TextEditingController controller}) {
     return SizedBox(
       width: 400,
       height: 37,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10),
         child: TextField(
+          controller: controller,
           maxLines: maxLines,
           style: TextStyle(color: text),
           decoration: InputDecoration(

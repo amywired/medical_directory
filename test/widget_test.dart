@@ -3,9 +3,7 @@ import 'package:medical_directory/main.dart';
 
 void main() {
   testWidgets('App load smoke test', (WidgetTester tester) async {
-
-    await tester.pumpWidget(const MedicalApp());
-
+    await tester.pumpWidget(const MyApp());
 
     expect(find.text('Medical Directory Mila'), findsOneWidget);
   });

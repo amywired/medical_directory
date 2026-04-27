@@ -14,8 +14,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _selectedIndex = 0;
-
   // دالة الاتصال بأرقام الطوارئ في ميلة
   Future<void> _makeCall(String number) async {
     final Uri url = Uri.parse('tel:$number');
